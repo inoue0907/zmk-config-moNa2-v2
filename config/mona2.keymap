@@ -112,10 +112,10 @@
 
         layer_3 {
             bindings = <
-&trans  &kp LC(LS(TAB))     &kp PRINTSCREEN         &kp LC(TAB)              &trans                                     &kp HOME      &kp LC(LEFT)  &kp LC(RIGHT)  &kp END        &trans
-&trans  &kp LG(LEFT_ARROW)  &kp LG(RIGHT_ARROW)     &kp LC(LG(LEFT_ARROW))   &kp LC(LG(RIGHT_ARROW))            &trans  &kp LEFT      &kp DOWN      &kp UP         &kp RIGHT      &trans
-&trans  &kp LEFT_SHIFT      &kp LG(LS(LEFT_ARROW))  &kp LG(LS(RIGHT_ARROW))  &trans                   &trans    &trans  &kp LS(LEFT)  &kp LS(DOWN)  &kp LS(UP)     &kp LS(RIGHT)  &trans
-&trans  &trans              &trans                  &trans                   &trans                   &trans    &trans  &kp LGUI                                                  &trans
+&kp PSCRN  &kp LC(LS(TAB))     &kp PRINTSCREEN         &kp LC(TAB)              &kp LA(F4)                                    &kp HOME      &kp LC(LEFT)  &kp LC(RIGHT)  &kp END        &trans
+&trans     &kp LG(LEFT_ARROW)  &kp LG(RIGHT_ARROW)     &kp LC(LG(LEFT_ARROW))   &kp LC(LG(RIGHT_ARROW))               &trans  &kp LEFT      &kp DOWN      &kp UP         &kp RIGHT      &trans
+&trans     &kp LEFT_SHIFT      &kp LG(LS(LEFT_ARROW))  &kp LG(LS(RIGHT_ARROW))  &trans                   &kp LG(L)    &trans  &kp LS(LEFT)  &kp LS(DOWN)  &kp LS(UP)     &kp LS(RIGHT)  &trans
+&trans     &trans              &trans                  &trans                   &trans                   &trans       &trans  &kp LGUI                                                  &trans
             >;
 
             sensor-bindings = <&inc_dec_kp C_VOL_DN C_VOL_UP>;
