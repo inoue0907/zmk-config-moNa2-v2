@@ -69,7 +69,7 @@
     device = <&trackball_central>;
 
     snipe {
-        layers = <2>;
+        layers = <1>;
         input-processors = <&zip_xy_scaler 1 3>;
     };
 
