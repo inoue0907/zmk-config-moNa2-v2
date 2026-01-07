@@ -146,10 +146,10 @@
 
         SCROLL {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                    &trans  &trans      &trans           &trans  &trans
-&trans  &trans  &trans  &trans  &trans            &trans  &trans  &trans      &trans           &trans  &trans
-&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &kp C_PREV  &kp C_PLAY_PAUSE &C_NEXT &trans
-&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans                                       &trans
+&trans  &trans  &trans  &trans  &trans                    &trans  &trans      &trans           &trans     &trans
+&trans  &trans  &trans  &trans  &trans            &trans  &trans  &trans      &trans           &trans     &trans
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &kp C_PREV  &kp C_PLAY_PAUSE &kp C_NEXT &trans
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans                                          &trans
             >;
 
             sensor-bindings = <&scroll_up_down>;
