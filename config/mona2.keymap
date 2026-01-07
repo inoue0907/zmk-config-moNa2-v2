@@ -83,7 +83,7 @@
 &kp Q             &kp L         &kp U         &kp COMMA         &kp DOT                                              &kp F        &kp W  &kp R  &kp Y  &kp P
 &kp E             &kp I         &kp A         &kp O             &kp MINUS                        &kp BSPC            &kp K        &kp T  &kp N  &kp S  &lt 3 H
 &mt LEFT_SHIFT Z  &kp X         &kp C         &kp V             &kp SEMI     &lt 4 COLON         &kp UNDERSCORE      &kp G        &kp D  &kp M  &kp J  &lt 3 B
-&kp LCTRL         &kp LEFT_WIN  &kp LEFT_ALT  &lt 2 LANGUAGE_1  &lt 1 SPACE  &lt 3 LANGUAGE_2    &mt LEFT_SHIFT TAB  &lt 1 ENTER                       &kp SLASH
+&kp LCTRL         &kp LEFT_WIN  &kp LEFT_ALT  &lt 2 LANGUAGE_1  &lt 1 SPACE  &lt 3 LANGUAGE_2    &mt LEFT_SHIFT TAB  &lt 1 ENTER                       &lp 6 SLASH
             >;
 
             sensor-bindings = <&scroll_up_down>;
@@ -148,7 +148,7 @@
             bindings = <
 &trans  &trans  &trans  &trans  &trans                    &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans  &trans            &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &C_PREV &C_PP   &C_NEXT &trans
 &trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans                          &trans
             >;
 
