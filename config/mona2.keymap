@@ -45,6 +45,22 @@
             bindings = <&to 0 &macro_param_1to1 &kp MACRO_PLACEHOLDER>;
             label = "TO_LAYER_0";
         };
+
+        // BT切り替え + US配列（tog_ls_off）
+        bt_sel_us: bt_sel_us {
+            compatible = "zmk,behavior-macro-one-param";
+            #binding-cells = <1>;
+            bindings = <&tog_ls_off &macro_param_1to2 &bt BT_SEL_CMD MACRO_PLACEHOLDER>;
+            label = "BT_SEL_US";
+        };
+
+        // BT切り替え + JIS配列（tog_ls_on）
+        bt_sel_jis: bt_sel_jis {
+            compatible = "zmk,behavior-macro-one-param";
+            #binding-cells = <1>;
+            bindings = <&tog_ls_on &macro_param_1to2 &bt BT_SEL_CMD MACRO_PLACEHOLDER>;
+            label = "BT_SEL_JIS";
+        };
     };
 
     behaviors {
@@ -123,10 +139,10 @@
 
         layer_4 {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                         &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4
-&trans  &trans  &trans  &trans  &trans            &sys_reset   &trans        &trans        &trans        &trans        &trans
-&trans  &trans  &trans  &trans  &trans  &trans    &bootloader  &trans        &trans        &trans        &trans        &bt BT_CLR
-&trans  &trans  &trans  &trans  &trans  &trans    &trans       &trans                                                  &bt BT_CLR_ALL
+&trans  &trans  &trans  &trans  &trans                         &bt_sel_us 0  &bt_sel_jis 1 &bt_sel_jis 2 &bt_sel_jis 3  &bt_sel_jis 4
+&trans  &trans  &trans  &trans  &trans            &sys_reset   &trans        &trans        &trans        &trans         &trans
+&trans  &trans  &trans  &trans  &trans  &trans    &bootloader  &trans        &trans        &trans        &trans         &bt BT_CLR
+&trans  &trans  &trans  &trans  &trans  &trans    &trans       &trans                                                   &bt BT_CLR_ALL
             >;
 
             sensor-bindings = <&scroll_up_down>;
