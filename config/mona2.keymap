@@ -129,7 +129,7 @@
         layer_3 {
             bindings = <
 &kp PSCRN   &kp LC(LS(TAB))     &kp PRINTSCREEN         &kp LC(TAB)              &kp LA(F4)                                    &kp HOME      &kp LC(LEFT)  &kp LC(RIGHT)  &kp END        &trans
-&kp ESCAPE  &kp LG(LEFT_ARROW)  &kp LG(RIGHT_ARROW)     &kp LC(LG(LEFT_ARROW))   &kp LC(LG(RIGHT_ARROW))               &trans  &kp LEFT      &kp DOWN      &kp UP         &kp RIGHT      &kp LC(LA(TAB))
+&kp ESCAPE  &kp LA(LC(LG(LEFT_ARROW)))  &kp LC(LG(LEFT_ARROW))  &kp LC(LG(RIGHT_ARROW))  &kp LA(LC(LG(RIGHT_ARROW)))  &trans  &kp LEFT      &kp DOWN      &kp UP         &kp RIGHT      &kp LC(LA(TAB))
 &tog_ls     &kp LEFT_SHIFT      &kp LG(LS(LEFT_ARROW))  &kp LG(LS(RIGHT_ARROW))  &trans                   &kp LG(L)    &trans  &kp LS(LEFT)  &kp LS(DOWN)  &kp LS(UP)     &kp LS(RIGHT)  &trans
 &trans      &trans              &trans                  &trans                   &trans                   &trans       &trans  &kp LGUI                                                  &trans
             >;
