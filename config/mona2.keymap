@@ -123,7 +123,7 @@
 &trans  &kp N7  &kp N8  &kp N9     &kp DOT                          &kp C_PREV     &kp C_RW         &kp C_PLAY_PAUSE  &kp C_FF     &kp C_NEXT
 &kp N0  &kp N4  &kp N5  &kp N6     &kp MINUS               &kp DEL  &kp PG_UP      &trans           &trans            &trans       &trans
 &trans  &kp N1  &kp N2  &kp N3     &kp FSLH   &trans       &trans   &kp PAGE_DOWN  &kp LC(LS(TAB))  &kp LG(LS(D))     &kp LC(TAB)  &trans
-&trans  &trans  &trans  &kp ASTRK  &kp PLUS   &kp EQUAL    &trans   &kp LEFT_WIN                                                   &to 7
+&trans  &trans  &trans  &kp ASTRK  &kp PLUS   &kp EQUAL    &trans   &kp LS(ENTER)                                                   &to 7
             >;
 
             sensor-bindings = <&scroll_right_left>;
