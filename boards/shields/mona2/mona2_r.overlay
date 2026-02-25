@@ -1,5 +1,6 @@
 #include "mona2.dtsi"
 #include <input/processors.dtsi>
+#include <behaviors/input_gestures_accel.dtsi>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
 
 
@@ -63,10 +64,22 @@
 };
 
 
+&pointer_accel {
+    input-type = <INPUT_EV_REL>;
+    codes = <INPUT_REL_X INPUT_REL_Y>;
+    sensitivity = <1200>;
+    max-factor = <3000>;
+    acceleration-exponent = <2>;
+    speed-threshold = <1200>;
+    speed-max = <6000>;
+    sensor-dpi = <400>;
+};
+
 // Overrides for the input listener node
 &trackball_central_listener {
     status = "okay";
     device = <&trackball_central>;
+    input-processors = <&pointer_accel>;
 
     snipe {
         layers = <1>;
