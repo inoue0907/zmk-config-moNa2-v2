@@ -64,6 +64,20 @@
             bindings = <&tog_ls_on &macro_param_1to2 &bt BT_SEL_CMD MACRO_PLACEHOLDER>;
             label = "BT_SEL_JIS";
         };
+
+        ctrl_alt_tab: ctrl_alt_tab {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <30>;
+            tap-ms = <10>;
+            bindings =
+                <&macro_press &kp LCTRL>,
+                <&macro_press &kp LALT>,
+                <&macro_tap &kp TAB>,
+                <&macro_release &kp LALT>,
+                <&macro_release &kp LCTRL>;
+            label = "CTRL_ALT_TAB";
+        };
     };
 
     behaviors {
@@ -148,7 +162,7 @@
         layer_3 {
             bindings = <
 &kp PSCRN  &trans                      &trans                  &trans                   &kp LA(F4)                                                          &kp HOME      &kp LC(LEFT)  &kp LC(RIGHT)  &kp END        &trans
-&trans     &kp LA(LC(LG(LEFT_ARROW)))  &kp LC(LG(LEFT_ARROW))  &kp LC(LG(RIGHT_ARROW))  &kp LA(LC(LG(RIGHT_ARROW)))               &trans                    &kp LEFT      &kp DOWN      &kp UP         &kp RIGHT      &kp LC(LA(TAB))
+&trans     &kp LA(LC(LG(LEFT_ARROW)))  &kp LC(LG(LEFT_ARROW))  &kp LC(LG(RIGHT_ARROW))  &kp LA(LC(LG(RIGHT_ARROW)))               &trans                    &kp LEFT      &kp DOWN      &kp UP         &kp RIGHT      &ctrl_alt_tab
 &tog_ls    &trans                      &trans                  &trans                   &trans                       &kp LG(L)    &trans                    &kp LS(LEFT)  &kp LS(DOWN)  &kp LS(UP)     &kp LS(RIGHT)  &trans
 &trans     &trans                      &trans                  &trans                   &trans                       &trans       &mt LEFT_SHIFT LS(ENTER)  &kp LEFT_WIN                                              &trans
             >;
@@ -181,7 +195,7 @@
         SCROLL {
             bindings = <
 &trans  &trans  &trans  &trans  &trans                    &trans      &trans    &trans                 &trans    &trans
-&trans  &trans  &trans  &trans  &trans            &trans  &trans      &kp J     &original_key_press K  &kp L     &trans
+&trans  &trans  &trans  &trans  &trans            &trans  &trans      &kp J     &kp K  &kp L     &trans
 &trans  &trans  &trans  &trans  &trans  &trans    &trans  &kp C_PREV  &kp C_RW  &kp C_PLAY_PAUSE       &kp C_FF  &kp C_NEXT
 &trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans                                                 &trans
             >;
