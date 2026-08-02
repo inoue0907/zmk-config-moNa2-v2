@@ -102,9 +102,13 @@
     excluded-positions = <
         6
         8
+        11 // Left-hand MB3
+        12 // Left-hand MB2
+        13 // Left-hand MB1
         17 // J
         18 // J
         19 // K
+        21 // Immediate Shift on the Z position
     >;
 };
 

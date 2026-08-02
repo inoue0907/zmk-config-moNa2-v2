@@ -28,9 +28,9 @@
     combos {
         compatible = "zmk,combos";
 
-        layer4_ESC {
+        ql_ESC {
             bindings = <&kp ESC>;
-            key-positions = <39 38>;
+            key-positions = <0 1>;
         };
 
         tab {
@@ -230,7 +230,7 @@
             bindings = <
 &trans  &trans    &trans    &trans    &trans                    &trans  &mkp MB4  &trans    &mkp MB5  &trans
 &trans  &mkp MB3  &mkp MB2  &mkp MB1  &trans            &trans  &trans  &mkp MB1  &mkp MB3  &mkp MB2  &trans
-&trans  &trans    &trans    &trans    &trans  &trans    &trans  &trans  &trans    &trans    &trans    &trans
+&kp LEFT_SHIFT  &trans    &trans    &trans    &trans  &trans    &trans  &trans  &trans    &trans    &trans    &trans
 &trans  &trans    &trans    &trans    &trans  &trans    &trans  &trans                                &trans
             >;
 
