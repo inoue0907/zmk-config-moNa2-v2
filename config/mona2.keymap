@@ -155,7 +155,7 @@
         pair_dance: pair_dance {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
-            tapping-term-ms = <250>;
+            tapping-term-ms = <350>;
             bindings = <&paren_pair>, <&bracket_pair>, <&brace_pair>;
         };
     };
