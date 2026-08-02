@@ -158,6 +158,14 @@
             tapping-term-ms = <350>;
             bindings = <&paren_pair>, <&bracket_pair>, <&brace_pair>;
         };
+
+        pair_shift: pair_shift {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "hold-preferred";
+            tapping-term-ms = <200>;
+            bindings = <&kp>, <&pair_dance>;
+        };
     };
 
     keymap {
@@ -201,7 +209,7 @@
 &kp PSCRN  &trans                      &trans                  &trans                   &kp LA(F4)                                                          &kp HOME      &kp LC(LEFT)  &kp LC(RIGHT)  &kp END        &trans
 &trans     &kp LA(LC(LG(LEFT_ARROW)))  &kp LC(LG(LEFT_ARROW))  &kp LC(LG(RIGHT_ARROW))  &kp LA(LC(LG(RIGHT_ARROW)))               &trans                    &kp LEFT      &kp DOWN      &kp UP         &kp RIGHT      &ctrl_alt_tab
 &tog_ls    &trans                      &trans                  &trans                   &trans                       &kp LG(L)    &select_line               &kp LS(LEFT)  &kp LS(DOWN)  &kp LS(UP)     &kp LS(RIGHT)  &trans
-&trans     &trans                      &trans                  &trans                   &trans                       &trans       &pair_dance                 &kp LEFT_WIN                                              &trans
+&trans     &trans                      &trans                  &trans                   &trans                       &trans       &pair_shift LEFT_SHIFT 0    &kp LEFT_WIN                                              &trans
             >;
 
             sensor-bindings = <&scroll_right_left>;
