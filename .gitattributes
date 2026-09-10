@@ -1,0 +1,8 @@
+# 生成物と生成スクリプトは LF 固定。
+# tools/ のスクリプトは LF で書き出すので、リポジトリ側も LF に揃えておかないと
+# CI で再生成したときに中身が同じでも全行差分になる。
+docs/*.svg    text eol=lf
+docs/*.html   text eol=lf
+tools/*.py    text eol=lf
+tools/*.html  text eol=lf
+tools/*.md    text eol=lf

@@ -1,0 +1,72 @@
+name: keymap docs
+
+# キーマップや生成スクリプトを触ったら図を作り直して、
+# 変わっていればコミットし、早見表を GitHub Pages に出す。
+on:
+  push:
+    branches: [main]
+    paths:
+      - config/mona2.keymap
+      - boards/shields/mona2/mona2.dtsi
+      - tools/**
+      - .github/workflows/keymap-docs.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write   # 生成物のコミット
+  pages: write      # Pages へのデプロイ
+  id-token: write   # deploy-pages の OIDC
+
+# 生成物のコミットが競合しないよう直列化する
+concurrency:
+  group: keymap-docs
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Regenerate diagrams
+        run: |
+          python tools/gen_keymap_svg.py
+          python tools/gen_keymap_viewer.py
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- docs; then
+            echo "docs are already up to date"
+            exit 0
+          fi
+          git diff --stat -- docs
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs
+          # [skip ci] でファームウェアビルド(build.yml)の空回しを防ぐ
+          git commit -m "docs: regenerate keymap diagrams [skip ci]"
+          git push
+
+      - name: Stage Pages site
+        run: |
+          mkdir -p _site
+          cp docs/keymap-viewer.html _site/index.html
+          cp docs/keymap-positions.svg _site/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
