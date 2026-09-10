@@ -1,0 +1,245 @@
+<title>moNa2 キーマップ早見表</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+JP:wght@400;500&display=swap">
+<style>
+:root {
+  --ground: #f0ede8;
+  --panel:  #fdfcfa;
+  --rim:    #d8d1c7;
+  --ink:    #23262b;
+  --muted:  #756f66;
+  --faint:  #a49c91;
+  --copper: #a85a2b;
+  --on-copper: #fffdfb;
+  --teal:   #1f6b66;
+  --violet: #64489f;
+  --gold:   #7d5a0d;
+  --rust:   #9d3a2c;
+
+  /* one knob: every key metric below is a fraction of --u */
+  --u: 72px;
+  --gap: 6px;
+  --pad-t: calc(var(--u) * .042);
+  --pad-b: calc(var(--u) * .055);
+  --row:   calc(var(--u) * .17);
+  --fs-pos:  calc(var(--u) * .152);
+  --fs-sub:  calc(var(--u) * .134);
+  --fs-main: calc(var(--u) * .225);
+  --fs-ja:   calc(var(--u) * .168);
+
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --sans: "IBM Plex Sans JP", "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif;
+  --disp: "Archivo", "IBM Plex Sans JP", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #15171b;
+    --panel:  #1e2126;
+    --rim:    #32373f;
+    --ink:    #e7e4df;
+    --muted:  #9a948b;
+    --faint:  #6b6660;
+    --copper: #d98a4e;
+    --on-copper: #15171b;
+    --teal:   #5cb1a9;
+    --violet: #a48ce6;
+    --gold:   #d6ac4e;
+    --rust:   #e08575;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #15171b;
+  --panel:  #1e2126;
+  --rim:    #32373f;
+  --ink:    #e7e4df;
+  --muted:  #9a948b;
+  --faint:  #6b6660;
+  --copper: #d98a4e;
+  --on-copper: #15171b;
+  --teal:   #5cb1a9;
+  --violet: #a48ce6;
+  --gold:   #d6ac4e;
+  --rust:   #e08575;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--ground); color: var(--ink);
+  font-family: var(--sans); font-size: 14px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1000px; margin: 0 auto; padding: 30px 20px 56px; }
+
+h1 {
+  font-family: var(--disp); font-weight: 700; font-size: 24px;
+  letter-spacing: -.015em; margin: 0; line-height: 1.15;
+}
+h1 span { color: var(--faint); }
+.hint { color: var(--muted); font-size: 12.5px; margin: 6px 0 22px; }
+.hint b { color: var(--ink); font-weight: 500; }
+.hint code { font-family: var(--mono); font-size: 12px; }
+
+.rail { display: flex; flex-wrap: wrap; gap: 6px; }
+.tab {
+  display: flex; align-items: baseline; gap: 7px;
+  background: var(--panel); color: var(--ink);
+  border: 1px solid var(--rim); border-radius: 4px;
+  padding: 5px 11px 5px 9px; cursor: pointer;
+  font-family: var(--sans); font-size: 12.5px; line-height: 1.35;
+}
+.tab .n {
+  font-family: var(--disp); font-weight: 700; font-size: 12.5px;
+  color: var(--faint); font-variant-numeric: tabular-nums;
+}
+.tab:hover { border-color: var(--faint); }
+.tab[aria-selected="true"] {
+  background: var(--copper); border-color: var(--copper); color: var(--on-copper);
+}
+.tab[aria-selected="true"] .n { color: inherit; opacity: .72; }
+.tab:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+
+.boardscroll { overflow-x: auto; margin: 24px -20px 0; padding: 4px 20px 12px; }
+.board {
+  position: relative;
+  width: calc(13 * var(--u) - var(--gap));
+  height: calc(4 * var(--u) - var(--gap));
+}
+.key {
+  position: absolute;
+  left: calc(var(--x) * var(--u)); top: calc(var(--y) * var(--u));
+  width: calc(var(--u) - var(--gap)); height: calc(var(--u) - var(--gap));
+  background: var(--panel); border: 1px solid var(--rim); border-radius: 6px;
+  display: flex; flex-direction: column; overflow: hidden;
+  padding: var(--pad-t) 4px var(--pad-b); color: var(--ink);
+}
+.pos {
+  flex: none; height: var(--row); line-height: var(--row);
+  font-family: var(--disp); font-weight: 700; font-size: var(--fs-pos);
+  color: var(--faint); font-variant-numeric: tabular-nums;
+}
+.subrow, .legend { display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.subrow { flex: none; height: var(--row); }
+.subrow[hidden] { display: none; }
+.legend { flex: 1 1 auto; }
+.sub, .main {
+  flex: none; width: max-content; white-space: pre; text-align: center;
+  transform-origin: center center;
+}
+.sub {
+  font-family: var(--mono); font-size: var(--fs-sub); font-weight: 500;
+  letter-spacing: .01em; color: var(--muted); line-height: 1.1;
+}
+.main { font-family: var(--mono); font-weight: 500; font-size: var(--fs-main); line-height: 1.2; }
+.main.ja { font-family: var(--sans); font-size: var(--fs-ja); line-height: 1.22; }
+
+.key[data-cat="trans"] { background: transparent; border-style: dashed; }
+.key[data-cat="trans"] .main { color: var(--faint); }
+.key[data-cat="layer"]  { border-color: var(--copper); }
+.key[data-cat="layer"]  .main, .key[data-cat="layer"]  .sub { color: var(--copper); }
+.key[data-cat="mod"]    .main, .key[data-cat="mod"]    .sub { color: var(--teal); }
+.key[data-cat="mouse"]  .main, .key[data-cat="mouse"]  .sub { color: var(--violet); }
+.key[data-cat="macro"]  .main, .key[data-cat="macro"]  .sub { color: var(--gold); }
+.key[data-cat="system"] .main, .key[data-cat="system"] .sub { color: var(--rust); }
+
+/* only --u changes with width; every metric follows it */
+@media (max-width: 1000px) { :root { --u: 66px; } }
+@media (max-width: 780px)  { :root { --u: 60px; } }
+</style>
+
+<div class="wrap">
+  <h1>moNa2 <span>キーマップ</span></h1>
+  <p class="hint">キー左上の数字が <b>位置番号</b>。<code>config/mona2.keymap</code> の <code>bindings</code> はこの 0 → 41 の順。</p>
+
+  <div class="rail" role="tablist" aria-label="レイヤー" id="rail"></div>
+
+  <div class="boardscroll">
+    <div class="board" id="board"></div>
+  </div>
+</div>
+
+<script id="kmdata" type="application/json">__DATA__</script>
+<script>
+(function () {
+  var D = JSON.parse(document.getElementById('kmdata').textContent);
+  var LAY = D.layers, GEO = D.geo, cur = 0;
+  var JA_RE = /[^\x00-\x7f\n]/;
+
+  var rail = document.getElementById('rail');
+  var tabs = LAY.map(function (L, i) {
+    var b = document.createElement('button');
+    b.className = 'tab'; b.type = 'button'; b.setAttribute('role', 'tab');
+    b.innerHTML = '<span class="n"></span><span></span>';
+    b.firstChild.textContent = 'L' + L.id;
+    b.lastChild.textContent = L.ja;
+    b.onclick = function () { cur = i; paint(); };
+    b.onkeydown = function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!d) return;
+      e.preventDefault();
+      cur = (cur + d + LAY.length) % LAY.length;
+      paint(); tabs[cur].focus();
+    };
+    rail.appendChild(b);
+    return b;
+  });
+
+  var board = document.getElementById('board');
+  var cells = GEO.map(function (g, pos) {
+    var k = document.createElement('div');
+    k.className = 'key';
+    k.style.setProperty('--x', g.x);
+    k.style.setProperty('--y', g.y);
+    k.innerHTML = '<div class="pos"></div>' +
+                  '<div class="subrow"><span class="sub"></span></div>' +
+                  '<div class="legend"><span class="main"></span></div>';
+    k.querySelector('.pos').textContent = pos;
+    board.appendChild(k);
+    return {
+      el: k,
+      sub: k.querySelector('.sub'),
+      subrow: k.querySelector('.subrow'),
+      legend: k.querySelector('.legend'),
+      main: k.querySelector('.main')
+    };
+  });
+
+  /* legends never wrap (white-space: pre); anything still too big is
+     scaled down uniformly so it can't spill over or collide */
+  function fit(span, box) {
+    span.style.transform = '';
+    var w = span.offsetWidth, h = span.offsetHeight;
+    if (!w || !h) return;
+    var s = Math.min(1, (box.clientWidth - 1) / w, (box.clientHeight - 1) / h);
+    if (s < 0.995) span.style.transform = 'scale(' + Math.max(s, 0.45).toFixed(3) + ')';
+  }
+
+  function paint() {
+    tabs.forEach(function (t, i) {
+      t.setAttribute('aria-selected', i === cur ? 'true' : 'false');
+      t.tabIndex = i === cur ? 0 : -1;
+    });
+    LAY[cur].keys.forEach(function (k, pos) {
+      var c = cells[pos];
+      c.el.dataset.cat = k.cat;
+      c.el.title = '位置 ' + pos + '  ' + k.raw;
+      c.sub.textContent = k.sub;
+      c.subrow.hidden = !k.sub;
+      c.main.textContent = k.main;
+      c.main.className = 'main' + (JA_RE.test(k.main) ? ' ja' : '');
+    });
+    refit();
+  }
+
+  function refit() {
+    cells.forEach(function (c) {
+      if (!c.subrow.hidden) fit(c.sub, c.subrow);
+      fit(c.main, c.legend);
+    });
+  }
+
+  var t;
+  addEventListener('resize', function () { clearTimeout(t); t = setTimeout(refit, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
+  paint();
+})();
+</script>
