@@ -55,10 +55,17 @@ mona2_r.overlay
 ばらして USB を挿さなくても、BLE DFU でファームウェアを更新できる。ZMK 本体に OTA は
 無いが、XIAO nRF52840 の Adafruit ブートローダーが持つ BLE OTA 機能を叩く仕組み。
 
-**転送はスマホから行う。** BLE DFU のセントラル役が必要で、Nordic の
-「nRF Device Firmware Update」アプリは iOS / Android 専用。PC の
-nRF Connect for Desktop でもできるが nRF52840 ドングル等の外付け無線アダプタが必須で、
-Windows 内蔵 Bluetooth では使えない。
+転送経路は 2 つある。**PC から焼く方が速いので基本はこちら。**
+
+| 経路 | パケット長 | 速度の目安 | 備考 |
+| --- | --- | --- | --- |
+| **PC**（`tools/ble_flash.py`） | 最大 244 バイト | 速い | 内蔵 Bluetooth で可。要 OTAFIX |
+| iPhone / Android アプリ | **iOS は 20 バイト固定** | iOS で約 2 KB/s | 手軽。PC が無くても焼ける |
+
+iOS の nRF DFU アプリは 20 バイトパケットに制限されていて（OTAFIX の README に
+明記されている）、OTAFIX の高 MTU を活かせない。273 KB の右手側で 2 分以上かかる。
+PC 経路は Bleak 経由で **PC 内蔵の Bluetooth がそのまま使える**（nRF52840 ドングルは
+不要。ドングルが要るのは nRF Connect for Desktop の話）。
 
 ### 0. 最初の一回だけ USB で仕込む
 
@@ -95,7 +102,7 @@ layer_3 も `&lt 3 LANGUAGE_2`(pos 38) の隣が pos 37。
 放置すると自動では戻らない（`bootloader_dfu_start` のタイムアウトが 0 で無期限待機）。
 BLE 広告を続けて電池を食うだけなので、片側が急に死んだらまず電源を入れ直す。
 
-### 1. PC 側でやること
+### 1. ビルド（push するだけ）
 
 `config/mona2.keymap` を編集して push するだけ。
 GitHub Actions が `.uf2` をビルドし、続けて DFU 用 ZIP に変換して
@@ -110,7 +117,31 @@ GitHub Actions が `.uf2` をビルドし、続けて DFU 用 ZIP に変換し�
 | `mona2_r-blueboot.zip` | 右手側を BLE DFU で更新 |
 | `mona2_l.uf2` / `mona2_r.uf2` | OTA が失敗したときの USB 復旧用 |
 
-### 2. iPhone 側でやること
+### 2. 焼く: PC から（推奨）
+
+[`tools/ble_flash.py`](tools/ble_flash.py) を `uv` で走らせる。依存は PEP 723 の
+インラインメタデータに書いてあるので、`uv` さえあればどの PC でも環境構築は不要。
+
+1. キーボードで `&blueboot` を押して DFU モードに入れる
+2. これを実行する
+
+```bash
+uv run tools/ble_flash.py --side r
+```
+
+`--side r` で右手、`--side l` で左手。`dfu-latest` リリースから DFU ZIP を自動で
+落としてくるので、ファイルを手で用意する必要はない。手元の ZIP を使うなら `--zip PATH`。
+
+- `--wait` 見つかるまでスキャンを繰り返す（先にコマンドを叩いておける）
+- `--no-high-mtu` 転送が早々に `Operation Failed` になるとき
+- `--prn 0` PRN を切って最速を狙う
+- `--yes` 確認プロンプトを省略
+
+DFU プロトコルの実装は [recrof/nrf_dfu_py](https://github.com/recrof/nrf_dfu_py) の
+`dfu_lib.py` を使う。**あちらはライセンス表記が無いのでリポジトリには同梱していない。**
+コミット固定で実行時に取得し、SHA-256 を検証して `~/.cache/zmk-ble-flash/` に置く。
+
+### 3. 焼く: iPhone から
 
 1. App Store で Nordic Semiconductor の
    **nRF Device Firmware Update** を入れる（iOS 16 以上）。
@@ -126,13 +157,20 @@ GitHub Actions が `.uf2` をビルドし、続けて DFU 用 ZIP に変換し�
    終わると自動で ZMK に戻る。
 5. 反対側も 2〜4 を繰り返す。**左右を同時に更新してはいけない。**
 
-`Operation Failed` が転送開始直後に出るときは、アプリの **Request high MTU** を
-オフにして再試行する。PRN を小さくするのも効く。OTAFIX は MTU 拡大が売りなので
-本来はオンで速いが、相性が出たらここを落とす。OTAFIX 側にも
-[推奨設定のメモ](https://github.com/oltaco/Adafruit_nRF52_Bootloader_OTAFIX/blob/master/docs/oldsettings.md)
-がある。
+#### アプリの設定
 
-### 3. 運用: 右手だけ更新していい場合
+OTAFIX 2.x の[推奨設定](https://github.com/oltaco/Adafruit_nRF52_Bootloader_OTAFIX#recommended-ota-dfu-settings)は
+**PRN ON / Number of packets 30**。ここを 8 にすると 20 バイト × 8 = 160 バイトごとに
+往復確認が入って約 2 KB/s まで落ちるので、必ず 30 にする（iOS では 60 超は非推奨）。
+ほかは Disable resume ON / Force scanning ON / Keep bond OFF。
+
+**Request high MTU** と **Prepare object delay** は iOS には存在しない。前者は iOS が
+MTU を自動ネゴシエートするため、後者は Secure DFU 用の設定で Legacy DFU には
+無関係なため。
+
+転送前に対象側の電池を充電しておくこと。転送中に電圧が落ちると失敗する。
+
+### 4. 運用: 右手だけ更新していい場合
 
 キーマップは親機（右手）にしか無い。左手は押されたキー位置を転送するだけで、
 レイヤー解決・コンボ・ホールドタップは全部右手が処理する。左手側で走らせる
@@ -151,9 +189,11 @@ behavior も「デバイス名」で引かれるので、behavior を足して�
   左手に置いた `&blueboot` を実行するのは左手の firmware なので、
   左手を焼いていないと押しても何も起きない）
 
-### 4. OTAFIX ブートローダー（任意）
+### 5. OTAFIX ブートローダー
 
-**入れなくても blueboot は動く。** 迷ったら入れないでよい。
+**現状: 右手側は導入済み（`0.9.2-OTAFIX2.3-BP1.4`）。左手側はまだ工場出荷の 0.6.1。**
+
+入れなくても blueboot は動くが、**PC 経路（高 MTU）を使うには OTAFIX が必要**。
 
 標準の Adafruit ブートローダーは、アプリ領域が無効な状態だと **USB のシリアル /
 UF2 モード**で待つ（XIAO のボード定義は `DEFAULT_TO_OTA_DFU` を有効にしていない）。
@@ -166,7 +206,10 @@ UF2 ドライブへ `.uf2` をコピーすれば戻る。文鎮化はしない�
 変わる。主な差分:
 
 - **アプリが無効ならリセットで BLE DFU 待機に戻る**（標準は USB モードに落ちる）
-- **MTU を 23 → 247 バイトに拡大**。転送が大幅に速くなる
+- **MTU を 23 → 247 バイトに拡大**。ただし活かせるのは Android アプリと
+  `tools/ble_flash.py` だけ。**iOS アプリは 20 バイト固定なので恩恵が無い**
+- **小パケットの結合**。64 バイト未満の書き込みを最大 240 バイトにまとめてから
+  flash に書くので、iOS 経路でも多少は速くなる
 - **遅延消去**。標準はアプリ領域を全消去してから受信するので開始した瞬間に
   既存ファームが無効になるが、OTAFIX は必要なページだけ順次消す
 - BLE の送信出力を +8dBm に
@@ -175,15 +218,18 @@ UF2 ドライブへ `.uf2` をコピーすれば戻る。文鎮化はしない�
 
 #### 入れるかどうかの判断
 
-**組み立てた状態で左右それぞれの USB ポートにケーブルを挿せるなら、入れなくてよい。**
-転送失敗のコストが「ケーブル 1 本」で済むので、ブートローダー差し替え(この計画で
-唯一本当に文鎮化しうる操作)のリスクを負う理由がない。ポートが埋まっていて分解が
-必要な構造なら検討する。
+**PC 経路で焼くなら入れる。** 高 MTU が使えるかどうかで転送時間が桁違いになり、
+転送が短いほど失敗しにくい。加えて失敗しても USB が不要になる。
 
-誤爆時の復帰はリセット 1 回で、OTAFIX とは無関係。あちらのリスク軽減にはならない。
+入れなくてもよいのは、**スマホからしか焼かず、かつ組み立てた状態で USB ポートに
+ケーブルを挿せる**場合。iOS は 20 バイト固定で高 MTU の恩恵が無いので、
+残るメリットは失敗時の復旧経路だけになる。
 
-OTAFIX は ZMK ファームとは独立なので後からいつでも追加できる。まず入れずに運用して、
-実際に転送失敗が頻発したら入れるのが良い。
+書き換え自体はこの手順で唯一やり直せない操作（版を間違えると SWD ライターが必要）
+なので、`Board-ID` の確認は飛ばさないこと。
+
+なお**誤爆時の復帰はリセット 1 回で、OTAFIX とは無関係**。あちらのリスク軽減には
+ならない。OTAFIX は ZMK ファームとは独立なので後からいつでも追加できる。
 
 #### 導入手順
 

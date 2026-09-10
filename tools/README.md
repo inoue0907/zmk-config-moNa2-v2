@@ -1,5 +1,33 @@
 # tools
 
+## ble_flash.py — PC から無線でファームを焼く
+
+```bash
+uv run tools/ble_flash.py --side r      # 右手(親機)
+uv run tools/ble_flash.py --side l      # 左手
+```
+
+先にキーボードで `&blueboot` を押して DFU モードに入れておく。`dfu-latest`
+リリースから DFU ZIP を落として、PC 内蔵の Bluetooth で転送する。
+
+依存（`bleak`）は PEP 723 のインラインメタデータに書いてあるので、`uv` があれば
+どの PC でも環境構築は不要。`uv` が無い環境なら `pip install bleak` して
+`python tools/ble_flash.py` でも動く。
+
+DFU プロトコルの実装は [recrof/nrf_dfu_py](https://github.com/recrof/nrf_dfu_py) の
+`dfu_lib.py`。**ライセンス表記が無いリポジトリなので同梱していない。**
+`NRF_DFU_PY_COMMIT` で固定して実行時に取得し、`DFU_LIB_SHA256` で検証して
+`~/.cache/zmk-ble-flash/` に置く。上流を更新するときは 2 つの定数を揃えて差し替える
+（`sha256sum dfu_lib.py` で出せる）。
+
+`dfu_cli.py` を使わず `dfu_lib` を直接呼んでいるのは、あちらが buttonless DFU
+（アプリに繋いでブートローダーへ飛ばす）前提で、`&blueboot` で既に DFU モードに
+入っている今回の使い方と噛み合わないため。
+
+詳細と iPhone 経路はリポジトリ直下の README「無線でファームウェアを書き換える」を参照。
+
+## キーマップの図の生成
+
 キーマップの図を `config/mona2.keymap` から生成するスクリプト。どこから実行しても
 リポジトリ直下を基準にパスを解決する（標準ライブラリのみ、Python 3）。
 
