@@ -105,6 +105,7 @@
         17 // J
         18 // J
         19 // K
+        21 // Immediate Shift on the Z position
     >;
 };
 
