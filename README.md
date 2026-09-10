@@ -168,21 +168,34 @@ UF2 モード**で待つ。つまり転送が途中で切れると無線では�
 - DFU 広告名が `XIAO_DFU`（標準は `AdaDFU`）
 - ダブルリセット → USB UF2 ドライブ は引き続き使えるので最終手段は残る
 
-導入は片側ずつ、USB で一度だけ:
+導入は USB で一度だけ。**「0. 最初の一回だけ USB で仕込む」と同じ分解作業なので、
+片側ずつまとめて済ませる**のが良い。手順は片側につき:
 
 1. XIAO を USB につなぐ。
 2. 約 0.5 秒以内にリセット 2 回で UF2 ドライブを出す。リセットボタンが無ければ
    `RST` と `GND` を素早く 2 回ショート。
-3. ドライブの `INFO_UF2.TXT` を開いて `Board-ID` を確認する。
+3. ドライブの `INFO_UF2.TXT` を開いて `Board-ID` を確認する。**ここが一番大事。**
 4. [OTAFIX の最新リリース](https://github.com/oltaco/Adafruit_nRF52_Bootloader_OTAFIX/releases/latest)
-   から対応する `update-..._nosd.uf2` を落とす。
+   から対応する `update-..._nosd.uf2`（70KB 程度）を落とす。
    - `Board-ID: nRF52840-SeeedXiaoSense-v1` → `update-xiao_nrf52840_ble_sense_bootloader-..._nosd.uf2`
    - それ以外の XIAO nRF52840 BLE → `update-xiao_nrf52840_ble_bootloader-..._nosd.uf2`
-5. UF2 ドライブへコピーして再起動を待つ。反対側も同様。
+5. UF2 ドライブへコピー。自動でリセットがかかる。
+6. もう一度ダブルリセットして UF2 ドライブを出し、`INFO_UF2.TXT` が OTAFIX に
+   なっているか確認する。
+7. 続けて ZMK 本体（`dfu-latest` リリースの `mona2_l.uf2` / `mona2_r.uf2`）を
+   同じドライブへコピーする。
+8. 反対側も 1〜7 を繰り返す。
+
+`_nosd` は SoftDevice（S140 7.3.0）をそのまま残してブートローダー部分だけ
+差し替える版。同じリリースにある `.hex` / `.zip` は SoftDevice 込みの完全版で、
+SWD ライター用なので UF2 ドライブには使わない。
+
+導入できたかは `&blueboot` を押したときの BLE 広告名で分かる。
+**`AdaDFU` なら標準のまま、`XIAO_DFU` になっていれば OTAFIX が入っている。**
 
 **非 Sense の XIAO でも Sense 用ブートローダーが入っている個体がある。**
-製品名や外観ではなく必ず `INFO_UF2.TXT` に合わせること。間違えると SWD ライターが
-必要になる。標準版に戻したい場合は
+製品名や外観ではなく必ず `INFO_UF2.TXT` に合わせること。間違えると USB も
+出なくなり SWD ライターが必要になる。標準版に戻したい場合は
 [Adafruit 標準ブートローダー](https://github.com/adafruit/Adafruit_nRF52_Bootloader/releases/latest)
 の `update-xiao_nrf52840_ble..._nosd.uf2` を同じ手順で入れる。
 
