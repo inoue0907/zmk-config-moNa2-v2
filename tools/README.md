@@ -17,6 +17,23 @@ python tools/gen_keymap_viewer.py   # -> docs/keymap-viewer.html    (レイヤ�
 | `gen_keymap_viewer.py` | ビューアの HTML（データを `keymap.template.html` に流し込む） |
 | `keymap.template.html` | ビューアの見た目。`__DATA__` がデータの差し込み位置 |
 
-キーを増減・移動したときは `mona2_layout.py` の `GEO` を
+## 自動更新
+
+`.github/workflows/keymap-docs.yml` が `config/mona2.keymap` /
+`boards/shields/mona2/mona2.dtsi` / `tools/**` の変更を拾って再生成し、
+差分があれば `docs/` をコミットし、早見表を GitHub Pages に出す。
+
+- 早見表: <https://inoue0907.github.io/zmk-config-moNa2-v2/>
+- 手動実行: `gh workflow run keymap-docs.yml`
+
+コミットメッセージ本文に `[skip ci]` という文字列を書かないこと。
+GitHub はメッセージ全体を見るので、説明として書いただけでも
+その push のワークフローが全部スキップされる。
+
+## 配置やレイヤーを変えたとき
+
+キーを増減・移動したら `mona2_layout.py` の `GEO` を
 `boards/shields/mona2/mona2.dtsi` の `physical_layout0` に合わせて直す。
-レイヤーを追加したら同ファイルの `LAYER_NAMES` に名前を足す（無いと生成時に止まる）。
+レイヤーを追加したら同ファイルの `LAYER_NAMES` に名前を足す。
+`bindings` の数が合わない場合と名前の無いレイヤーがある場合は生成時に止まるので、
+図だけ古いまま気づかず進むことはない。
