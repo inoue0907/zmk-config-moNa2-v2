@@ -3,3 +3,82 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
   build:
     uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@v0.3.0
+
+  # 無線(BLE DFU)で焼くためのパッケージを作る。
+  # ビルド済み .uf2 を blueboot の変換スクリプトで Nordic DFU ZIP にして、
+  # スマホから直接ダウンロードできるよう Release へ貼る。
+  dfu:
+    name: Package BLE DFU
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # Release の作成
+      actions: read     # ビルド成果物の取得
+    steps:
+      - name: Download firmware
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware
+          path: firmware
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install packaging tools
+        run: |
+          python -m pip install --quiet adafruit-nrfutil
+          curl -sSfL -o blueboot.py \
+            https://raw.githubusercontent.com/te9no/zmk-feature-blueboot/main/scripts/blueboot.py
+
+      # Release に貼りやすい名前へ揃えつつ、片側ずつ DFU ZIP を作る。
+      # .uf2 も一緒に置いておく(OTA が途中で切れたときの USB 復旧用)。
+      - name: Package each half
+        run: |
+          mkdir -p dfu
+          for side in l r; do
+            uf2=$(find firmware -name "mona2_${side}*.uf2" | head -1)
+            if [ -z "$uf2" ]; then
+              echo "::error::mona2_${side} の .uf2 が見つかりません"
+              exit 1
+            fi
+            cp "$uf2" "dfu/mona2_${side}.uf2"
+            python blueboot.py -o "dfu/mona2_${side}-blueboot.zip" "dfu/mona2_${side}.uf2"
+          done
+          reset=$(find firmware -name "settings_reset*.uf2" | head -1)
+          if [ -n "$reset" ]; then
+            cp "$reset" dfu/settings_reset.uf2
+          fi
+          ls -l dfu
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: firmware-dfu
+          path: dfu
+
+      # main への push だけ、固定タグの Release を作り直して常に最新を置く。
+      # スマホの Safari から直接落とせる(ログイン不要・二重 ZIP なし)。
+      - name: Publish rolling release
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > notes.md <<EOF
+          main の \`${GITHUB_SHA:0:7}\` から自動生成した無線書き換え用パッケージ。
+
+          | ファイル | 用途 |
+          | --- | --- |
+          | \`mona2_l-blueboot.zip\` | 左手側を BLE DFU で更新 |
+          | \`mona2_r-blueboot.zip\` | 右手側を BLE DFU で更新 |
+          | \`mona2_l.uf2\` / \`mona2_r.uf2\` | USB 復旧用 |
+
+          手順は README の「無線でファームウェアを書き換える」を参照。
+          左右の同時更新は不可。必ず片側ずつ。
+          EOF
+          gh release delete dfu-latest --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag || true
+          gh release create dfu-latest dfu/mona2_l-blueboot.zip dfu/mona2_r-blueboot.zip dfu/mona2_l.uf2 dfu/mona2_r.uf2 \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "無線DFU用パッケージ (${GITHUB_SHA:0:7})" \
+            --notes-file notes.md

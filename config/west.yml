@@ -16,6 +16,8 @@ manifest:
       url-base: https://github.com/kot149
     - name: nuovotaka
       url-base: https://github.com/nuovotaka
+    - name: te9no    # <-- 無線DFU (BLE OTA)
+      url-base: https://github.com/te9no
   projects:
     - name: zmk
       remote: zmkfirmware
@@ -39,5 +41,9 @@ manifest:
     - name: zmk-pointing-acceleration-alpha
       remote: nuovotaka
       revision: main
+    - name: zmk-feature-blueboot
+      remote: te9no
+      revision: main
+      path: modules/zmk-feature-blueboot
   self:
     path: config
