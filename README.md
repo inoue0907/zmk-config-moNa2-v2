@@ -1,3 +1,9 @@
+![moNa2 v2 key positions 0-41](docs/keymap-positions.svg)
+
+キー位置番号。`config/mona2.keymap` の `bindings` はこの 0 → 41 の順に並びます。
+
+---
+
 COROPITを使用する方は以下のようにコードを編集してください。
 
 mona2_r.overlay
