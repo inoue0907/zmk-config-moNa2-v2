@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  Key press that is only sent while the IME is believed to be on.
+  IME state is tracked from LANGUAGE_1 (IME on) / LANGUAGE_2 (IME off) key presses.
+
+compatible: "zmk,behavior-ime-key-press"
+
+include: one_param.yaml

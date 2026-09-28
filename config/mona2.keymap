@@ -110,24 +110,27 @@
             label = "SHIFT_LEFT_DRAG";
         };
 
+        // 対になる括弧を入力し、カーソルを内側に戻す。
+        // IME ON のときは括弧が未確定のまま残るので、← の前に Enter で確定させる。
+        // （&ime_kp は IME ON のときだけキーを送る。src/behavior_ime_key_press.c を参照）
         paren_pair: paren_pair {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
-            bindings = <&kp LEFT_PARENTHESIS &kp RIGHT_PARENTHESIS &kp LEFT>;
+            bindings = <&kp LEFT_PARENTHESIS &kp RIGHT_PARENTHESIS &ime_kp ENTER &kp LEFT>;
             label = "PAREN_PAIR";
         };
 
         bracket_pair: bracket_pair {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
-            bindings = <&kp LEFT_BRACKET &kp RIGHT_BRACKET &kp LEFT>;
+            bindings = <&kp LEFT_BRACKET &kp RIGHT_BRACKET &ime_kp ENTER &kp LEFT>;
             label = "BRACKET_PAIR";
         };
 
         brace_pair: brace_pair {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
-            bindings = <&kp LEFT_BRACE &kp RIGHT_BRACE &kp LEFT>;
+            bindings = <&kp LEFT_BRACE &kp RIGHT_BRACE &ime_kp ENTER &kp LEFT>;
             label = "BRACE_PAIR";
         };
 
@@ -142,6 +145,12 @@
     };
 
     behaviors {
+        // IME ON（最後に押したのが LANGUAGE_1）のときだけキーを送る
+        ime_kp: ime_key_press {
+            compatible = "zmk,behavior-ime-key-press";
+            #binding-cells = <1>;
+        };
+
         // Keep the original key_press behavior for ZMK core components
 
         original_key_press: original_key_press {

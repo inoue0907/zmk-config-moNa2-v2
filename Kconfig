@@ -1,0 +1,4 @@
+config ZMK_BEHAVIOR_IME_KEY_PRESS
+    bool "Key press that only fires while IME is on"
+    default y
+    depends on DT_HAS_ZMK_BEHAVIOR_IME_KEY_PRESS_ENABLED
