@@ -144,7 +144,7 @@ def label(binding):
         return (keycode(base), mods, cat)
     if op == '&mt':
         return (keycode(a[1]), keycode(a[0]), 'mod')
-    if op == '&lt':
+    if op in ('&lt', '&lt_sym'):
         return (keycode(a[1]), 'L' + a[0], 'layer')
     if op == '&mo':
         return ('L' + a[0], u'長押し', 'layer')
