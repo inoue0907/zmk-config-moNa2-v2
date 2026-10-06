@@ -78,12 +78,15 @@ blueboot 入りのファームウェアを最初に入れるところは、ど�
 
 | レイヤー | 位置 | ベースでのキー | 入る半分 |
 | --- | --- | --- | --- |
-| layer_1（数字・マウス） | pos 39 | 右親指 `&mt LEFT_SHIFT TAB` | 右手（親機） |
-| layer_3（ナビ・選択） | pos 37 | 左親指 `&lt 1 SPACE` | 左手 |
+| layer_4（BT・システム） | pos 28 | 右手 `&kp G` | 右手（親機） |
+| layer_4（BT・システム） | pos 21 | 左手 `&mt LEFT_SHIFT Z` | 左手 |
 
-layer_1 は `&lt 1 SPACE`(pos 37) と `&lt 1 ENTER`(pos 40) で入る。pos 39 と pos 40 は
-隣り合う右親指キーなので、ENTER をホールドしたまま隣を叩くと DFU に落ちる。
-layer_3 も `&lt 3 LANGUAGE_2`(pos 38) の隣が pos 37。
+layer_4 は左手の `&lt 4 COLON`(pos 26) を押さえている間だけ入る。pos 26 を押さえたまま
+右手で pos 28、左手なら小指で pos 21。
+
+以前は layer_1 の pos 39 と layer_3 の pos 37（どちらも親指キー）に置いていたが、
+左右の親指を同時に押したときに layer_1 / layer_3 に入って誤爆し、キーボードが
+固まることがあったので layer_4 へ移した。
 
 #### 誤爆したとき
 
