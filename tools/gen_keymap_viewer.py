@@ -16,12 +16,27 @@ TEMPLATE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                         'keymap.template.html')
 
 
+def hold_target(binding):
+    """押している間だけ効くレイヤーキーなら、そのレイヤー番号を返す。"""
+    t = binding.split()
+    if len(t) >= 2 and t[0] in ('&lt', '&lt_hp', '&mo') and t[1].isdigit():
+        return int(t[1])
+    return None
+
+
+def key_data(binding):
+    d = dict(zip(('main', 'sub', 'cat'), label(binding)), raw=binding)
+    to = hold_target(binding)
+    if to is not None:
+        d['to'] = to
+    return d
+
+
 def main():
     layers = [{
         'id': L['id'],
         'ja': L['ja'],
-        'keys': [dict(zip(('main', 'sub', 'cat'), label(b)), raw=b)
-                 for b in L['raw']],
+        'keys': [key_data(b) for b in L['raw']],
     } for L in parse_layers()]
 
     data = {'layers': layers,
