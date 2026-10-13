@@ -141,6 +141,11 @@ h1 span { color: var(--faint); }
 .key[data-cat="mouse"]  .main, .key[data-cat="mouse"]  .sub { color: var(--violet); }
 .key[data-cat="macro"]  .main, .key[data-cat="macro"]  .sub { color: var(--gold); }
 .key[data-cat="system"] .main, .key[data-cat="system"] .sub { color: var(--rust); }
+/* 押している間だけ、そのレイヤーを見せる */
+.key[data-to] { cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: none; }
+.key[data-to]:hover { background: #fbf3ea; }
+.key.held { background: var(--copper); border-color: var(--copper); border-style: solid; }
+.key.held .main, .key.held .sub, .key.held .pos { color: #fff; }
 
 /* only --u changes with width; every metric follows it */
 @media (max-width: 1000px) { :root { --u: 66px; } }
@@ -149,7 +154,7 @@ h1 span { color: var(--faint); }
 
 <div class="wrap">
   <h1>moNa2 <span>キーマップ</span></h1>
-  <p class="hint">キー左上の数字が <b>位置番号</b>。<code>config/mona2.keymap</code> の <code>bindings</code> はこの 0 → 41 の順。</p>
+  <p class="hint">キー左上の数字が <b>位置番号</b>。<code>config/mona2.keymap</code> の <code>bindings</code> はこの 0 → 41 の順。レイヤーキーはマウスで押している間、そのレイヤーを表示する。</p>
 
   <div class="rail" role="tablist" aria-label="レイヤー" id="rail"></div>
 
@@ -163,6 +168,8 @@ h1 span { color: var(--faint); }
 (function () {
   var D = JSON.parse(document.getElementById('kmdata').textContent);
   var LAY = D.layers, GEO = D.geo, cur = 0;
+  var byId = {}; LAY.forEach(function (L, i) { byId[L.id] = i; });
+  var peek = null, heldPos = null;   // マウスで押しているレイヤーキー
   var JA_RE = /[^\x00-\x7f\n]/;
 
   var rail = document.getElementById('rail');
@@ -194,6 +201,11 @@ h1 span { color: var(--faint); }
                   '<div class="subrow"><span class="sub"></span></div>' +
                   '<div class="legend"><span class="main"></span></div>';
     k.querySelector('.pos').textContent = pos;
+    k.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0 || k.dataset.to == null) return;
+      e.preventDefault();
+      peek = byId[k.dataset.to]; heldPos = pos; paint();
+    });
     board.appendChild(k);
     return {
       el: k,
@@ -214,14 +226,27 @@ h1 span { color: var(--faint); }
     if (s < 0.995) span.style.transform = 'scale(' + Math.max(s, 0.45).toFixed(3) + ')';
   }
 
+  function release() {
+    if (peek == null) return;
+    peek = null; heldPos = null; paint();
+  }
+  addEventListener('pointerup', release);
+  addEventListener('pointercancel', release);
+  addEventListener('blur', release);
+
   function paint() {
+    var shown = peek != null ? peek : cur;
     tabs.forEach(function (t, i) {
-      t.setAttribute('aria-selected', i === cur ? 'true' : 'false');
+      t.setAttribute('aria-selected', i === shown ? 'true' : 'false');
       t.tabIndex = i === cur ? 0 : -1;
     });
-    LAY[cur].keys.forEach(function (k, pos) {
+    LAY[shown].keys.forEach(function (k, pos) {
       var c = cells[pos];
       c.el.dataset.cat = k.cat;
+      // 今見えているレイヤーへ移るキーは押しても変わらないので対象外
+      if (k.to != null && byId[k.to] != null && byId[k.to] !== shown) c.el.dataset.to = k.to;
+      else delete c.el.dataset.to;
+      c.el.classList.toggle('held', pos === heldPos);
       c.el.title = '位置 ' + pos + '  ' + k.raw;
       c.sub.textContent = k.sub;
       c.subrow.hidden = !k.sub;
