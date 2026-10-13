@@ -134,6 +134,72 @@
             label = "BRACE_PAIR";
         };
 
+        // 選択中の文字列を引数の記号で囲む: Ctrl+X → 記号 → Ctrl+V → 記号
+        // IME ON のときは記号が未確定のまま残るので、それぞれ Enter で確定させる。
+        // 注意: クリップボードは選択文字列で上書きされる。
+        //       VS Code などは未選択で Ctrl+X すると行全体を切り取る。
+        wrap_with: wrap_with {
+            compatible = "zmk,behavior-macro-one-param";
+            #binding-cells = <1>;
+            wait-ms = <30>;
+            tap-ms = <10>;
+            bindings =
+                <&kp LC(X)>,
+                <&macro_param_1to1 &kp MACRO_PLACEHOLDER>,
+                <&ime_kp ENTER>,
+                <&kp LC(V)>,
+                <&macro_param_1to1 &kp MACRO_PLACEHOLDER>,
+                <&ime_kp ENTER>;
+            label = "WRAP_WITH";
+        };
+
+        // 括弧は開きと閉じが違うので、種類ごとに別のマクロにする（中身は wrap_with と同じ流れ）。
+        // hold-tap は長押し側に引数を 1 つしか渡せないので、2 引数マクロにはできない。
+        wrap_paren: wrap_paren {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <30>;
+            tap-ms = <10>;
+            bindings =
+                <&kp LC(X)>,
+                <&kp LEFT_PARENTHESIS>,
+                <&ime_kp ENTER>,
+                <&kp LC(V)>,
+                <&kp RIGHT_PARENTHESIS>,
+                <&ime_kp ENTER>;
+            label = "WRAP_PAREN";
+        };
+
+        wrap_bracket: wrap_bracket {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <30>;
+            tap-ms = <10>;
+            bindings =
+                <&kp LC(X)>,
+                <&kp LEFT_BRACKET>,
+                <&ime_kp ENTER>,
+                <&kp LC(V)>,
+                <&kp RIGHT_BRACKET>,
+                <&ime_kp ENTER>;
+            label = "WRAP_BRACKET";
+        };
+
+        wrap_brace: wrap_brace {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <30>;
+            tap-ms = <10>;
+            bindings =
+                <&kp LC(X)>,
+                <&kp LEFT_BRACE>,
+                <&ime_kp ENTER>,
+                <&kp LC(V)>,
+                <&kp RIGHT_BRACE>,
+                <&ime_kp ENTER>;
+            label = "WRAP_BRACE";
+        };
+
         select_line: select_line {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
@@ -206,6 +272,47 @@
             tap-ms = <20>;
         };
 
+        // タップで記号を 1 つ、長押しで選択範囲をその記号で囲む（&wrap_with）。
+        // 使い方: &wrap_hold KEY KEY（同じキーコードを 2 回書く）
+        // tap-preferred なので、他のキーを押しても tapping-term を超えるまでは長押しにならない。
+        wrap_hold: wrap_hold {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <250>;
+            quick-tap-ms = <0>;
+            bindings = <&wrap_with>, <&kp>;
+        };
+
+        // 開き括弧用。タップで開き括弧、長押しで選択範囲を括弧で囲む。
+        // 使い方: &wrap_paren_hold 0 LEFT_PARENTHESIS（1 つ目の引数は使わない）
+        wrap_paren_hold: wrap_paren_hold {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <250>;
+            quick-tap-ms = <0>;
+            bindings = <&wrap_paren>, <&kp>;
+        };
+
+        wrap_bracket_hold: wrap_bracket_hold {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <250>;
+            quick-tap-ms = <0>;
+            bindings = <&wrap_bracket>, <&kp>;
+        };
+
+        wrap_brace_hold: wrap_brace_hold {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <250>;
+            quick-tap-ms = <0>;
+            bindings = <&wrap_brace>, <&kp>;
+        };
+
         pair_dance: pair_dance {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
@@ -253,9 +360,9 @@
 
         layer_2 {
             bindings = <
-&kp F1   &kp F2   &kp F3   &kp F4   &kp F5                         &kp HASH       &kp EXCLAMATION  &kp SINGLE_QUOTE   &kp LEFT_PARENTHESIS  &kp RIGHT_PARENTHESIS
-&kp F6   &kp F7   &kp F8   &kp F9   &kp F10            &kp CARET   &kp AMPERSAND  &kp QUESTION     &kp DOUBLE_QUOTES  &kp LEFT_BRACE        &kp RIGHT_BRACE
-&kp F11  &kp F12  &kp F13  &kp F14  &kp F15  &trans    &kp DOLLAR  &kp PERCENT    &kp BACKSLASH    &kp GRAVE          &kp LEFT_BRACKET      &kp RIGHT_BRACKET
+&kp F1   &kp F2   &kp F3   &kp F4   &kp F5                         &kp HASH       &kp EXCLAMATION  &wrap_hold SINGLE_QUOTE SINGLE_QUOTE   &wrap_paren_hold 0 LEFT_PARENTHESIS  &kp RIGHT_PARENTHESIS
+&kp F6   &kp F7   &kp F8   &kp F9   &kp F10            &kp CARET   &kp AMPERSAND  &kp QUESTION     &wrap_hold DOUBLE_QUOTES DOUBLE_QUOTES  &wrap_brace_hold 0 LEFT_BRACE        &kp RIGHT_BRACE
+&kp F11  &kp F12  &kp F13  &kp F14  &kp F15  &trans    &kp DOLLAR  &kp PERCENT    &kp BACKSLASH    &wrap_hold GRAVE GRAVE          &wrap_bracket_hold 0 LEFT_BRACKET      &kp RIGHT_BRACKET
 &trans   &trans   &trans   &trans   &trans   &trans    &kp TILDE   &kp AT                                                                   &kp PIPE
             >;
 

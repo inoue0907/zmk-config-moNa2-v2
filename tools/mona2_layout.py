@@ -173,6 +173,8 @@ def label(binding):
         return (u'行選択', '', 'macro')
     if op == '&shift_left_drag':
         return (u'ドラッグ', 'Shift', 'macro')
+    if op == '&wrap_hold' or (op.startswith('&wrap_') and op.endswith('_hold')):
+        return (keycode(a[1]), u'囲む', 'macro')
     if op in ('&pair_shift', '&pair_dance'):
         return ('()[]{}', keycode(a[0]) if a else '', 'macro')
     # 未知のマクロ: ノード名をそのまま出す（気づけるように）
