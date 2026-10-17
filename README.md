@@ -2,6 +2,8 @@
 
 キー位置番号。`config/mona2.keymap` の `bindings` はこの 0 → 41 の順に並びます。
 
+[キーマップ](https://inoue0907.github.io/zmk-config-moNa2-v2/)
+
 ---
 
 COROPITを使用する方は以下のようにコードを編集してください。
