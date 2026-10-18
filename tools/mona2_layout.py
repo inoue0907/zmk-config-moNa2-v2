@@ -41,6 +41,10 @@ LAYER_NAMES = {
     'MOUSE':         (5, u'オートマウス'),
     'SCROLL':        (6, u'スクロール'),
     'numpad_layer':  (7, u'テンキー'),
+    'ipad_layer':     (8, u'iPad'),
+    'ipad_num_layer': (9, u'iPad+数字'),
+    'ipad_sym_layer': (10, u'iPad+記号'),
+    'ipad_nav_layer': (11, u'iPad+ナビ'),
 }
 
 
@@ -61,7 +65,8 @@ def parse_layers(path=KEYMAP):
         if node not in LAYER_NAMES:
             raise SystemExit('%s: LAYER_NAMES に名前を追加してください' % node)
         idx, ja = LAYER_NAMES[node]
-        layers.append({'id': idx, 'node': node, 'ja': ja, 'raw': toks})
+        layers.append({'id': idx, 'node': node, 'ja': ja, 'raw': toks,
+                       'ipad': node.startswith('ipad_')})
     layers.sort(key=lambda L: L['id'])
     return layers
 
@@ -122,12 +127,26 @@ def keycode(code):
     return code.replace('_', ' ').title()
 
 
-def label(binding):
+# iPad レイヤーでの修飾キーの呼び名
+IPAD_MOD = {'Win': 'Cmd', 'Alt': 'Option'}
+
+
+def label(binding, ipad=False):
     """binding 1 個 -> (main, sub, category)。main は "\\n" を含みうる。
 
     sub は「長押し側」や修飾キーを載せる小さい上段。
     category は色分け用: base / mod / layer / mouse / macro / system / trans
+    ipad=True なら Win / Alt を Cmd / Option と表示する。
     """
+    main, sub, cat = _label(binding)
+    if ipad:
+        main = IPAD_MOD.get(main, main)
+        if sub:
+            sub = '+'.join(IPAD_MOD.get(m, m) for m in sub.split('+'))
+    return main, sub, cat
+
+
+def _label(binding):
     t = binding.strip().split()
     op, a = t[0], t[1:]
     if op == '&trans':
@@ -167,13 +186,15 @@ def label(binding):
         return ('BT' + a[0], 'US', 'system')
     if op == '&bt_sel_jis':
         return ('BT' + a[0], 'JIS', 'system')
+    if op == '&bt_sel_ipad':
+        return ('BT' + a[0], 'iPad', 'system')
     if op == '&ctrl_alt_tab':
         return ('Tab', 'Ctrl+Alt', 'macro')
-    if op == '&select_line':
+    if op in ('&select_line', '&select_line_ipad'):
         return (u'行選択', '', 'macro')
     if op == '&shift_left_drag':
         return (u'ドラッグ', 'Shift', 'macro')
-    if op == '&wrap_hold' or (op.startswith('&wrap_') and op.endswith('_hold')):
+    if op.startswith('&wrap_') and (op.endswith('_hold') or op.endswith('_hold_ipad')):
         return (keycode(a[1]), u'囲む', 'macro')
     if op in ('&pair_shift', '&pair_dance'):
         return ('()[]{}', keycode(a[0]) if a else '', 'macro')

@@ -24,8 +24,8 @@ def hold_target(binding):
     return None
 
 
-def key_data(binding):
-    d = dict(zip(('main', 'sub', 'cat'), label(binding)), raw=binding)
+def key_data(binding, ipad=False):
+    d = dict(zip(('main', 'sub', 'cat'), label(binding, ipad)), raw=binding)
     to = hold_target(binding)
     if to is not None:
         d['to'] = to
@@ -36,7 +36,7 @@ def main():
     layers = [{
         'id': L['id'],
         'ja': L['ja'],
-        'keys': [key_data(b) for b in L['raw']],
+        'keys': [key_data(b, L['ipad']) for b in L['raw']],
     } for L in parse_layers()]
 
     data = {'layers': layers,

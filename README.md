@@ -51,6 +51,28 @@ mona2_r.overlay
 
 ---
 
+## iPad モード（BT 3）
+
+layer_4 の BT 3（pos 8）に切り替えると、出力先が iPad の間だけ修飾キーとショートカットが iPad 用に変わる。
+iPad 側は「設定 → 一般 → キーボード → ハードウェアキーボード」で **JIS** にしておく。
+
+| Windows で押すキー | iPad で出るもの |
+| --- | --- |
+| Ctrl / Win / Alt（左下） | Cmd / Ctrl / Option |
+| layer_1 の右手 Ctrl / Win | Cmd / Ctrl |
+| 記号の長押し（囲む） | Cmd+X / Cmd+V で囲む |
+| PrtSc | Cmd+Shift+3 |
+| Alt+F4 | Cmd+W |
+| Home / End、行選択 | Cmd+← / Cmd+→ |
+| Ctrl+← / → | Option+← / → |
+| 仮想デスクトップ切替、Ctrl+Alt+Tab | Cmd+(Shift+)Tab |
+| Win+L、Win+Ctrl+Alt+← / → | 無効 |
+
+- 切り替えは出力先で決まる（`src/ipad_mode.c`）。電源を入れ直しても BT 3 のままなら iPad モードで始まる。USB に出しているときは Windows のまま。
+- iPad の BT 番号を変えるときは `config/mona2.keymap` の `IPAD_BT_PROFILE` と、layer_4 の `&bt_sel_ipad` の位置を揃える。
+
+---
+
 ## 無線でファームウェアを書き換える
 
 [blueboot](https://github.com/te9no/zmk-feature-blueboot) を入れてあるので、基板を

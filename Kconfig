@@ -2,3 +2,8 @@ config ZMK_BEHAVIOR_IME_KEY_PRESS
     bool "Key press that only fires while IME is on"
     default y
     depends on DT_HAS_ZMK_BEHAVIOR_IME_KEY_PRESS_ENABLED
+
+config ZMK_IPAD_MODE
+    bool "Activate a layer while the iPad BLE profile is selected"
+    default y
+    depends on DT_HAS_ZMK_IPAD_MODE_ENABLED && ZMK_BLE

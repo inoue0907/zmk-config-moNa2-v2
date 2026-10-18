@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  Activates a layer while the selected output is a specific BLE profile.
+  Used to swap modifiers and shortcuts for iPad when its BT profile is selected.
+
+compatible: "zmk,ipad-mode"
+
+properties:
+  profile:
+    type: int
+    required: true
+    description: BLE profile index (0-based) that is connected to the iPad
+  layer:
+    type: int
+    required: true
+    description: Layer to keep active while that profile is the output

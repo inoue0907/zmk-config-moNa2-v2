@@ -11,6 +11,13 @@
 #define ZMK_POINTING_DEFAULT_SCRL_VAL 100
 #define MOUSE 5
 #define SCROLL 6
+// iPad 用。IPAD は BT 3 に出力しているあいだ src/ipad_mode.c が自動で有効にする。
+// IPAD_NUM / IPAD_SYM / IPAD_NAV は IPAD と layer_1 / 2 / 3 が重なったときに出る（conditional_layers）。
+#define IPAD 8
+#define IPAD_NUM 9
+#define IPAD_SYM 10
+#define IPAD_NAV 11
+#define IPAD_BT_PROFILE 3
 
 &mt {
     flavor = "balanced";
@@ -26,6 +33,31 @@
 &mkp_input_listener { input-processors = <&zip_temp_layer 5 10000>; };
 
 / {
+    ipad_mode {
+        compatible = "zmk,ipad-mode";
+        profile = <IPAD_BT_PROFILE>;
+        layer = <IPAD>;
+    };
+
+    conditional_layers {
+        compatible = "zmk,conditional-layers";
+
+        ipad_num {
+            if-layers = <1 IPAD>;
+            then-layer = <IPAD_NUM>;
+        };
+
+        ipad_sym {
+            if-layers = <2 IPAD>;
+            then-layer = <IPAD_SYM>;
+        };
+
+        ipad_nav {
+            if-layers = <3 IPAD>;
+            then-layer = <IPAD_NAV>;
+        };
+    };
+
     combos {
         compatible = "zmk,combos";
 
@@ -80,6 +112,16 @@
             #binding-cells = <1>;
             bindings = <&tog_ls_on &macro_param_1to2 &bt BT_SEL_CMD MACRO_PLACEHOLDER>;
             label = "BT_SEL_JIS";
+        };
+
+        // BT切り替え + JIS配列。中身は bt_sel_jis と同じ。iPad 用レイヤーは
+        // src/ipad_mode.c が出力先を見て切り替える（キーマップの図で iPad と分かるよう別名にしている）。
+
+        bt_sel_ipad: bt_sel_ipad {
+            compatible = "zmk,behavior-macro-one-param";
+            #binding-cells = <1>;
+            bindings = <&tog_ls_on &macro_param_1to2 &bt BT_SEL_CMD MACRO_PLACEHOLDER>;
+            label = "BT_SEL_IPAD";
         };
 
         ctrl_alt_tab: ctrl_alt_tab {
@@ -208,6 +250,79 @@
             bindings = <&kp HOME &kp LS(END)>;
             label = "SELECT_LINE";
         };
+
+        // ---- iPad 版 ----
+        // iPad は切り取り・貼り付けが Cmd、行頭・行末が Cmd+←/→。
+        // 流れは上の Windows 版と同じなので、説明はそちらを参照。
+
+        select_line_ipad: select_line_ipad {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <10>;
+            tap-ms = <10>;
+            bindings = <&kp LG(LEFT) &kp LG(LS(RIGHT))>;
+            label = "SELECT_LINE_IPAD";
+        };
+
+        wrap_with_ipad: wrap_with_ipad {
+            compatible = "zmk,behavior-macro-one-param";
+            #binding-cells = <1>;
+            wait-ms = <30>;
+            tap-ms = <10>;
+            bindings =
+                <&kp LG(X)>,
+                <&macro_param_1to1 &kp MACRO_PLACEHOLDER>,
+                <&ime_kp ENTER>,
+                <&kp LG(V)>,
+                <&macro_param_1to1 &kp MACRO_PLACEHOLDER>,
+                <&ime_kp ENTER>;
+            label = "WRAP_WITH_IPAD";
+        };
+
+        wrap_paren_ipad: wrap_paren_ipad {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <30>;
+            tap-ms = <10>;
+            bindings =
+                <&kp LG(X)>,
+                <&kp LEFT_PARENTHESIS>,
+                <&ime_kp ENTER>,
+                <&kp LG(V)>,
+                <&kp RIGHT_PARENTHESIS>,
+                <&ime_kp ENTER>;
+            label = "WRAP_PAREN_IPAD";
+        };
+
+        wrap_bracket_ipad: wrap_bracket_ipad {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <30>;
+            tap-ms = <10>;
+            bindings =
+                <&kp LG(X)>,
+                <&kp LEFT_BRACKET>,
+                <&ime_kp ENTER>,
+                <&kp LG(V)>,
+                <&kp RIGHT_BRACKET>,
+                <&ime_kp ENTER>;
+            label = "WRAP_BRACKET_IPAD";
+        };
+
+        wrap_brace_ipad: wrap_brace_ipad {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <30>;
+            tap-ms = <10>;
+            bindings =
+                <&kp LG(X)>,
+                <&kp LEFT_BRACE>,
+                <&ime_kp ENTER>,
+                <&kp LG(V)>,
+                <&kp RIGHT_BRACE>,
+                <&ime_kp ENTER>;
+            label = "WRAP_BRACE_IPAD";
+        };
     };
 
     behaviors {
@@ -313,6 +428,43 @@
             bindings = <&wrap_brace>, <&kp>;
         };
 
+        // iPad 版（長押し側が Cmd+X / Cmd+V のマクロになるだけ）
+        wrap_hold_ipad: wrap_hold_ipad {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <250>;
+            quick-tap-ms = <0>;
+            bindings = <&wrap_with_ipad>, <&kp>;
+        };
+
+        wrap_paren_hold_ipad: wrap_paren_hold_ipad {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <250>;
+            quick-tap-ms = <0>;
+            bindings = <&wrap_paren_ipad>, <&kp>;
+        };
+
+        wrap_bracket_hold_ipad: wrap_bracket_hold_ipad {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <250>;
+            quick-tap-ms = <0>;
+            bindings = <&wrap_bracket_ipad>, <&kp>;
+        };
+
+        wrap_brace_hold_ipad: wrap_brace_hold_ipad {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <250>;
+            quick-tap-ms = <0>;
+            bindings = <&wrap_brace_ipad>, <&kp>;
+        };
+
         pair_dance: pair_dance {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
@@ -382,7 +534,7 @@
 
         layer_4 {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                         &bt_sel_us 0  &bt_sel_jis 1  &bt_sel_jis 2  &bt_sel_jis 3  &bt_sel_jis 4
+&trans  &trans  &trans  &trans  &trans                         &bt_sel_us 0  &bt_sel_jis 1  &bt_sel_jis 2  &bt_sel_ipad 3  &bt_sel_jis 4
 &trans  &trans  &trans  &trans  &trans            &sys_reset   &tog_ls       &trans         &trans         &trans         &trans
 &blueboot  &trans  &trans  &trans  &trans  &trans    &bootloader  &blueboot     &trans         &trans         &trans         &bt BT_CLR
 &trans  &trans  &trans  &trans  &trans  &trans    &trans       &trans                                                     &bt BT_CLR_ALL
@@ -422,6 +574,61 @@
             >;
 
             sensor-bindings = <&scroll_up_down>;
+        };
+
+        // ---- iPad（BT 3 に出力しているあいだだけ有効） ----
+        // 機能が Windows と同じになるよう入れ替える。▽(&trans) のキーは下のレイヤーのまま。
+
+        // Ctrl / Win / Alt の位置を Cmd / Ctrl / Option にする（Windows の Ctrl+C の指で Cmd+C）
+        ipad_layer {
+            bindings = <
+&trans  &trans  &trans  &trans  &trans                    &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans            &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
+&kp LGUI  &kp LCTRL  &kp LALT  &trans  &trans  &trans    &trans  &trans                  &trans
+            >;
+
+            sensor-bindings = <&scroll_up_down>;
+        };
+
+        // layer_1 の右手の Ctrl / Win を Cmd / Ctrl に
+        ipad_num_layer {
+            bindings = <
+&trans  &trans  &trans  &trans  &trans                    &trans  &trans  &trans  &trans  &kp LGUI
+&trans  &trans  &trans  &trans  &trans            &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &kp LCTRL
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans                  &trans
+            >;
+
+            sensor-bindings = <&scroll_right_left>;
+        };
+
+        // layer_2 の「長押しで囲む」の切り取り・貼り付けを Cmd+X / Cmd+V に
+        ipad_sym_layer {
+            bindings = <
+&trans  &trans  &trans  &trans  &trans                    &trans  &trans  &wrap_hold_ipad SINGLE_QUOTE SINGLE_QUOTE   &wrap_paren_hold_ipad 0 LEFT_PARENTHESIS  &trans
+&trans  &trans  &trans  &trans  &trans            &trans  &trans  &trans  &wrap_hold_ipad DOUBLE_QUOTES DOUBLE_QUOTES  &wrap_brace_hold_ipad 0 LEFT_BRACE        &trans
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &wrap_hold_ipad GRAVE GRAVE                  &wrap_bracket_hold_ipad 0 LEFT_BRACKET    &trans
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans                  &trans
+            >;
+
+            sensor-bindings = <&scroll_up_down>;
+        };
+
+        // layer_3 の Windows のショートカットを iPad の同じ機能に
+        //   PrtSc -> Cmd+Shift+3      Alt+F4 -> Cmd+W       Home/End -> Cmd+←/→
+        //   Ctrl+←/→ -> Option+←/→    仮想デスクトップ切替 -> Cmd+(Shift+)Tab
+        //   Ctrl+Alt+Tab -> Cmd+Tab   Win -> Ctrl
+        //   Win+Ctrl+Alt+←/→ と Win+L(ロック) は iPad に同じ機能がないので無効（Cmd+L はアドレスバーに飛ぶ）
+        ipad_nav_layer {
+            bindings = <
+&kp LG(LS(N3))  &trans  &trans           &trans       &kp LG(W)                   &kp LG(LEFT)  &kp LA(LEFT)  &kp LA(RIGHT)  &kp LG(RIGHT)  &trans
+&trans          &none   &kp LG(LS(TAB))  &kp LG(TAB)  &none              &trans   &trans        &trans        &trans         &trans         &kp LG(TAB)
+&trans          &trans  &trans           &trans       &trans  &none      &select_line_ipad      &trans        &trans         &trans         &trans  &trans
+&trans          &trans  &trans           &trans       &trans  &trans     &trans   &kp LCTRL                                                 &trans
+            >;
+
+            sensor-bindings = <&scroll_right_left>;
         };
     };
 };
